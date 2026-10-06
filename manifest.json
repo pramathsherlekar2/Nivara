@@ -1,0 +1,9 @@
+{
+  "name":"Nivara — Disaster Intelligence",
+  "short_name":"Nivara",
+  "start_url":"./",
+  "display":"standalone",
+  "background_color":"#07101d",
+  "theme_color":"#0b1220",
+  "description":"Offline-first AI disaster intelligence and response platform."
+}

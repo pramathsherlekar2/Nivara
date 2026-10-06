@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#07111f" />
+  <meta name="description" content="Nivara — AI-powered disaster intelligence and response platform." />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <title>Nivara — Disaster Intelligence</title>
+</head>
+<body>
+  <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark"><span>N</span><i></i></div>
+        <div><strong>NIVARA</strong><small>DISASTER INTELLIGENCE</small></div>
+      </div>
+
+      <div class="workspace-label">WORKSPACE</div>
+      <nav>
+        <button class="nav-item active" data-view="overview"><span class="nav-icon">⌂</span><span>Command Center</span><kbd>01</kbd></button>
+        <button class="nav-item" data-view="report"><span class="nav-icon">＋</span><span>Report Incident</span><kbd>02</kbd></button>
+        <button class="nav-item" data-view="map"><span class="nav-icon">⌖</span><span>Risk Map</span><kbd>03</kbd></button>
+        <button class="nav-item" data-view="safezones"><span class="nav-icon">✓</span><span>Safe Zones</span><kbd>04</kbd></button>
+        <button class="nav-item" data-view="care"><span class="nav-icon">♡</span><span>Nivara Care</span><kbd>04</kbd></button>
+        <button class="nav-item" data-view="simulation"><span class="nav-icon">◇</span><span>Scenario Lab</span><kbd>05</kbd></button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="offline-card">
+          <div class="live-dot"><span></span></div>
+          <div><b id="networkLabel">Online</b><small>Offline-first enabled</small></div>
+          <span class="pulse-line"></span>
+        </div>
+        <div class="sidebar-note"><span>✦</span><div><b>Nivara Signal</b><small>Evidence → Risk → Action</small></div></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="crumb"><span>OVERVIEW</span><b>/</b><strong id="pageTitle">Command Center</strong></div>
+        <div class="top-actions">
+          <div class="connection"><span class="mini-dot"></span><span id="connectionText">Systems operational</span></div>
+          <button class="mode-btn" id="modeBtn"><span>◉</span> Citizen Mode <i>⌄</i></button>
+          <button class="theme-btn notification-btn" id="notificationBtn" title="Notifications"><span>◌</span> Alerts<i class="notification-count" id="notificationCount">0</i></button><button class="theme-btn" id="themeModeBtn" title="Toggle dark and light mode"><span>☼</span> Dark</button><button class="theme-btn" id="themeBtn" title="Customize interface color"><span>◐</span> Theme</button>
+          <button class="alert-btn" data-view="report"><span>＋</span> Report Emergency</button>
+          <button class="signin-btn" id="signInBtn"><span>↪</span> Sign In</button>
+        </div>
+      </header>
+
+      <section id="overview" class="view active">
+        <div class="hero-grid">
+          <div class="hero-card glass">
+            <div class="hero-top"><span class="status-pill"><i></i> Nivara Signal <b>HIGH</b></span><span class="hero-date">LIVE • DECISION SUPPORT</span></div>
+            <div class="hero-copy">
+              <div>
+                <p class="eyebrow">AI-POWERED DISASTER RESPONSE</p>
+                <h1>See the danger.<br><em>Act before it spreads.</em></h1>
+                <p class="hero-desc">Nivara turns fragmented disaster evidence into a clear picture of risk, priority and next action — even when connectivity fails.</p>
+                <div class="hero-actions"><button class="primary" data-view="report">Report an Emergency <span>↗</span></button><button class="secondary" data-view="simulation">Explore Scenario Lab <span>→</span></button></div>
+              </div>
+              <div class="signal-ring"><div class="ring-inner"><small>REGIONAL<br>RISK</small><strong>72</strong><span>/100</span></div><div class="orbit orbit-a"></div><div class="orbit orbit-b"></div></div>
+            </div>
+            <div class="hero-footer"><span>● Evidence confidence <b>89%</b></span><span>◌ Reports fused <b>128</b></span><span>↗ Trend <b class="up">+14%</b></span></div>
+          </div>
+          <div class="quick-card glass">
+            <div class="card-title"><div><span class="eyebrow">QUICK ACTION</span><h3>What do you need?</h3></div><span class="spark">✦</span></div>
+            <button class="quick-action" data-view="report"><span class="qa-icon danger-bg">!</span><div><b>Report a hazard</b><small>Send photo + location</small></div><span>→</span></button>
+            <button class="quick-action" data-view="care"><span class="qa-icon cyan-bg">♡</span><div><b>Help someone</b><small>Open Care assistance</small></div><span>→</span></button>
+            <button class="quick-action" data-view="safezones"><span class="qa-icon violet-bg">✓</span><div><b>Check safe zones</b><small>Find verified safer locations</small></div><span>→</span></button>
+          </div>
+        </div>
+
+        <div class="hotspot-alert glass" id="hotspotAlert"><div class="hotspot-icon">⌁</div><div><b id="hotspotTitle">High-risk hotspot detected</b><small id="hotspotText">4 related reports are clustering in the same area. Review the Risk Map.</small></div><button class="secondary" data-view="map">Review hotspot →</button></div>
+        <div class="section-bar"><div><span class="eyebrow">SITUATION SNAPSHOT</span><h2>Right now</h2></div><span class="updated">Updated 2 min ago · Demo intelligence</span></div>
+        <div class="stat-grid">
+          <div class="stat glass"><span class="stat-icon">◉</span><div><small>ACTIVE INCIDENTS</small><b>37</b><em>+6 today</em></div></div>
+          <div class="stat glass"><span class="stat-icon red-icon">!</span><div><small>CRITICAL</small><b>06</b><em>Needs attention</em></div></div>
+          <div class="stat glass"><span class="stat-icon cyan-icon">⌁</span><div><small>REPORTS FUSED</small><b>128</b><em>23 clusters</em></div></div>
+          <div class="stat glass"><span class="stat-icon violet-icon">⇄</span><div><small>OFFLINE QUEUE</small><b id="queueCount">03</b><em>Waiting to sync</em></div></div>
+        </div>
+
+        <div class="content-grid">
+          <div class="panel glass incident-panel">
+            <div class="panel-head"><div><span class="eyebrow">PRIORITY QUEUE</span><h3>Incidents needing attention</h3></div><span class="live-tag"><i></i> LIVE</span></div>
+            <div class="incident-list">
+              <article class="incident"><div class="severity critical"></div><div class="incident-main"><b>Urban Flooding <span>Zone 04</span></b><small>17 reports · worsening trend</small></div><div class="incident-score critical-text">94</div><span class="chevron">›</span></article>
+              <article class="incident"><div class="severity high"></div><div class="incident-main"><b>Landslide Risk <span>Hill Road</span></b><small>6 reports · road access blocked</small></div><div class="incident-score high-text">88</div><span class="chevron">›</span></article>
+              <article class="incident"><div class="severity high"></div><div class="incident-main"><b>Storm Damage <span>Sector B</span></b><small>9 reports · power disruption</small></div><div class="incident-score high-text">81</div><span class="chevron">›</span></article>
+              <article class="incident"><div class="severity medium"></div><div class="incident-main"><b>Waterlogging <span>Main Junction</span></b><small>11 reports · stable</small></div><div class="incident-score medium-text">68</div><span class="chevron">›</span></article>
+            </div>
+            <button class="view-all" data-view="map">View all incidents <span>→</span></button>
+          </div>
+
+          <div class="panel glass map-panel">
+            <div class="panel-head"><div><span class="eyebrow">SITUATION MAP</span><h3>Affected zones</h3></div><span class="cached"><i></i> Cached</span></div>
+            <div class="map-grid">
+              <div class="map-water water-a"></div><div class="map-water water-b"></div>
+              <div class="road r1"></div><div class="road r2"></div><div class="road r3"></div><div class="road r4"></div>
+              <div class="district d1"></div><div class="district d2"></div><div class="district d3"></div>
+              <span class="map-pin p1">!</span><span class="map-pin p2">!</span><span class="map-pin p3">!</span><span class="map-pin p4">!</span>
+              <span class="safe-zone"><i>✓</i> SAFE ZONE</span><div class="map-label l1">ZONE 04</div><div class="map-label l2">HILL ROAD</div>
+            </div>
+            <div class="map-legend"><span><i class="legend-red"></i> Critical</span><span><i class="legend-orange"></i> High</span><span><i class="legend-cyan"></i> Safe zone</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="report" class="view">
+        <div class="section-intro"><span class="eyebrow">MULTIMODAL REPORT</span><h2>Tell Nivara what is happening.</h2><p>Capture the situation once. Nivara is designed to combine evidence, context and user needs into an explainable assessment.</p></div>
+        <div class="report-layout">
+          <form class="panel glass report-form" id="reportForm">
+            <div class="form-heading"><span class="step-number">01</span><div><b>Incident details</b><small>Describe what you can see.</small></div></div>
+            <label>Incident category<select id="type"><option>Flooding</option><option>Earthquake</option><option>Landslide</option><option>Storm</option><option>Fire</option><option>Potholes</option><option>Drainage</option><option>Road Damage</option><option>Streetlight</option><option>Other</option></select></label>
+            <label>What do you see?<div class="voice-row"><textarea id="description" placeholder="Example: Water has covered the road and vehicles cannot pass."></textarea><button type="button" class="voice-btn" id="voiceReportBtn" title="Start voice reporting"><span class="voice-icon">🎙</span><span class="voice-label">Voice Report</span></button></div><div class="voice-status" id="voiceStatus"><strong>🎙 Tap “Voice Report” and speak naturally.</strong> Try: “There is severe flooding near the main gate and vehicles cannot pass.”</div></label>
+            <label>Evidence photo<div class="dropzone" id="evidenceDropzone"><input id="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" capture="environment" /><div class="upload-icon">↑</div><b>Upload evidence photo</b><span>Click to choose a photo or drag & drop it here</span><small>JPG, PNG, WEBP or GIF · compressed securely before AI analysis.</small><div class="evidence-selected" id="evidenceSelected" hidden><img id="evidencePreview" alt="Selected evidence preview"><div><strong id="evidenceName">Photo selected</strong><small id="evidenceMeta">Ready for analysis</small></div><button type="button" class="secondary evidence-remove" id="evidenceRemove">Remove</button></div></div></label>
+            <label>Location
+              <div class="location-row"><input id="location" placeholder="Area, landmark or nearby road" /><button type="button" class="secondary location-btn" id="liveLocationBtn">⌖ Use Live Location</button></div>
+              <div class="location-status" id="locationStatus"><i></i><span>Live location is off</span></div>
+            </label>
+            <div class="verification-panel"><div class="verification-head"><div><b>Before / After Verification</b><small>Upload evidence from before and after response.</small></div><button type="button" class="secondary" id="verifyBtn">Compare Evidence</button></div><div class="verification-grid"><div class="verify-box"><label><span>BEFORE</span><span>Initial evidence</span></label><input id="beforeImage" type="file" accept="image/*"><div class="verify-preview" id="beforePreview">No image selected</div></div><div class="verify-box"><label><span>AFTER</span><span>Resolution evidence</span></label><input id="afterImage" type="file" accept="image/*"><div class="verify-preview" id="afterPreview">No image selected</div></div></div><div class="verification-result" id="verificationResult">Verification status: <strong>Waiting for before and after evidence</strong></div></div>
+            <div class="care-select"><span>Who needs assistance?</span><button type="button" class="care-chip selected" data-care="standard">Standard</button><button type="button" class="care-chip" data-care="senior">Senior</button><button type="button" class="care-chip" data-care="child">Child / Guardian</button></div>
+            <button class="primary full" type="submit">Analyze & Save Incident <span>↗</span></button>
+          </form>
+          <div class="panel glass preview">
+            <div class="preview-head"><span class="eyebrow">NIVARA INTELLIGENCE</span><span class="ai-status" id="aiStatus"><i></i> GEMMA 4 READY</span></div>
+            <div class="ai-visual"><div class="ai-orb">N</div><div class="scan-lines"></div></div>
+            <h3 id="previewTitle">Ready for evidence</h3><p id="previewText">Nivara will combine image, description, location and user context into an explainable incident assessment.</p>
+            <div class="analysis-grid"><div><small>RISK</small><b id="previewRisk">—</b></div><div><small>CONFIDENCE</small><b id="previewConfidence">—</b></div><div><small>STATUS</small><b id="previewStatus">Draft</b></div></div>
+            <div class="explain"><span>✦</span><div><b>Why this matters</b><small id="previewEvidence">Gemma 4 analyzes the incident evidence and returns an explainable assessment. Human verification remains required.</small></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="map" class="view">
+        <div class="section-intro"><span class="eyebrow">GEOSPATIAL INTELLIGENCE</span><h2>Disaster situation map.</h2><p>Search, filter and prioritize incidents. Hotspots are surfaced when reports cluster in a high-risk area.</p></div>
+        <div class="filter-toolbar"><div class="map-location-search"><input id="mapLocationSearch" placeholder="Search a city or location — e.g. Mumbai…" aria-label="Search a city or location"><button class="primary map-search-btn" id="mapLocationSearchBtn" type="button">⌕ Search</button></div><button class="secondary map-locate-btn" id="mapLocateBtn" type="button">⌖ My location</button><input id="incidentSearch" placeholder="Filter incidents…"><select id="issueFilter"><option value="all">All issues</option><option>Potholes</option><option>Drainage</option><option>Flooding</option><option>Road Damage</option><option>Streetlight</option><option>Landslide</option><option>Fire</option><option>Earthquake</option><option>Storm</option></select><select id="severityFilter"><option value="all">All severity</option><option>Critical</option><option>High</option><option>Low</option></select><select id="statusFilter"><option value="all">All status</option><option>Open</option><option>In Progress</option><option>Resolved</option></select><span class="filter-count" id="filterCount">0 incidents</span></div>
+        <div class="map-search-status" id="mapSearchStatus"><span class="mini-dot"></span><span>Search for any city or place to reposition the live map.</span></div>
+        <div class="panel glass large-map-panel"><div class="map-toolbar"><span><i class="mini-dot"></i> <span id="mapActiveCount">37</span> active incidents</span><span id="mapPlaceLabel" class="map-place-label">Indore • Demo Operations View</span><button class="secondary" id="cachedMapBtn">Cached map <span>⌄</span></button></div><div id="operationMap" class="operation-map" aria-label="Interactive disaster operation map"></div><div class="map-attribution-note">Map data © OpenStreetMap contributors · Location search uses Nominatim for direct user searches.</div></div>
+        <div class="incident-registry" id="incidentRegistry"></div>
+      </section>
+
+      <section id="safezones" class="view">
+        <div class="section-intro"><span class="eyebrow">EVACUATION & SHELTER INTELLIGENCE</span><h2>Verified safe zones.</h2><p>Find nearby locations currently marked as safer for evacuation or temporary shelter. Always verify conditions with local authorities before moving.</p></div>
+        <div class="safezone-summary glass"><div class="safezone-summary-icon">✓</div><div><span class="eyebrow">SAFE ZONE STATUS</span><h3 id="safeZoneSummary">4 safer locations available</h3><p id="safeZoneSummaryText">Based on cached/demo operational data. Availability can change during an emergency.</p></div><button class="secondary" data-view="map">Open Risk Map →</button></div>
+        <div class="safezone-grid" id="safeZoneGrid">
+          <article class="safezone-card glass"><div class="safezone-card-head"><span class="safezone-status available">● AVAILABLE</span><span class="safezone-distance">1.2 km</span></div><h3>Community Relief Center</h3><p>Temporary shelter · drinking water · first-aid support</p><div class="safezone-meta"><span>Capacity <b>78%</b></span><span>Open <b>24/7</b></span></div><button class="secondary safezone-route" data-zone="Community Relief Center">View route →</button></article>
+          <article class="safezone-card glass"><div class="safezone-card-head"><span class="safezone-status available">● AVAILABLE</span><span class="safezone-distance">2.4 km</span></div><h3>Municipal School Shelter</h3><p>Family shelter · accessible entry · guardian support</p><div class="safezone-meta"><span>Capacity <b>61%</b></span><span>Open <b>24/7</b></span></div><button class="secondary safezone-route" data-zone="Municipal School Shelter">View route →</button></article>
+          <article class="safezone-card glass"><div class="safezone-card-head"><span class="safezone-status limited">● LIMITED</span><span class="safezone-distance">3.1 km</span></div><h3>District Sports Complex</h3><p>Large assembly area · water point · responder access</p><div class="safezone-meta"><span>Capacity <b>89%</b></span><span>Open <b>Daytime</b></span></div><button class="secondary safezone-route" data-zone="District Sports Complex">View route →</button></article>
+          <article class="safezone-card glass"><div class="safezone-card-head"><span class="safezone-status available">● AVAILABLE</span><span class="safezone-distance">4.7 km</span></div><h3>Emergency Medical Shelter</h3><p>Medical support · priority assistance · ambulance access</p><div class="safezone-meta"><span>Capacity <b>42%</b></span><span>Open <b>24/7</b></span></div><button class="secondary safezone-route" data-zone="Emergency Medical Shelter">View route →</button></article>
+        </div>
+        <div class="safezone-notice glass"><span>⚠</span><div><b>Safety notice</b><p>Safe-zone status is decision-support information, not a guarantee of safety. Follow official evacuation orders and responder instructions.</p></div></div>
+      </section>
+
+      <section id="care" class="view">
+        <div class="section-intro"><span class="eyebrow">HUMAN-CENTERED SAFETY</span><h2>Nivara Care</h2><p>Emergency guidance adapts to the needs people explicitly select — with simpler controls, clearer instructions and safer decision paths.</p></div>
+        <div class="care-grid">
+          <div class="care-card glass" data-care-card="senior"><div class="care-icon senior">◉</div><span class="care-label">01 · SENIOR</span><h3>Senior Assistance</h3><p>Large controls, simplified instructions, voice-friendly guidance and accessible-route preferences.</p><button type="button" class="secondary care-feature" data-care-feature="senior">Activate Senior Mode <span>→</span></button></div>
+          <div class="care-card glass featured-care" data-care-card="child"><div class="care-icon family">♡</div><span class="care-label">02 · FAMILY</span><h3>Child / Guardian</h3><p>A simple “I need help” flow, trusted-contact information and guardian-assisted emergency guidance.</p><button type="button" class="secondary care-feature" data-care-feature="child">Open Child Mode <span>→</span></button></div>
+          <div class="care-card glass" data-care-card="accessibility"><div class="care-icon access">✦</div><span class="care-label">03 · ACCESSIBILITY</span><h3>Accessibility</h3><p>Route and response preferences designed around mobility, vision and interaction needs.</p><button type="button" class="secondary care-feature" data-care-feature="accessibility">Set Preferences <span>→</span></button></div>
+        </div>
+        <div id="careActivePanel" class="care-active-panel glass" hidden>
+          <div class="care-active-head"><div><span class="eyebrow">CARE MODE ACTIVE</span><h3 id="careModeTitle">Senior Mode</h3><p id="careModeText">Nivara has adapted the interface for this user.</p></div><button type="button" class="secondary" id="careDeactivate">Deactivate</button></div>
+          <div class="care-actions" id="careActions"></div>
+        </div>
+        <div class="care-banner glass"><span>✦</span><div><b>Design principle</b><p>Nivara never guesses that someone is vulnerable from an image. Assistance mode is explicitly selected by the user, guardian or responder.</p></div></div>
+      </section>
+
+      <section id="simulation" class="view">
+        <div class="section-intro"><span class="eyebrow">SCENARIO LAB · WHAT-IF PLANNING</span><h2>Test how a disaster situation could escalate.</h2><p>Scenario Lab is a planning simulator: start from the current Nivara situation, change hazard conditions, and compare possible response priorities. It is not a prediction engine or an authoritative emergency forecast.</p></div>
+        <div class="scenario-explainer glass"><div class="scenario-flow"><span>LIVE / VERIFIED SIGNALS</span><b>→</b><span>NIVARA REPORTS</span><b>→</b><span>WHAT-IF SCENARIO</span><b>→</b><span>RESPONSE PRIORITIES</span></div><p><strong>Why use it?</strong> A responder can ask “What if rainfall intensifies?”, “What if more roads become blocked?” or “What if vulnerable-person requests increase?” and use the resulting comparison to decide what should be verified first.</p></div>
+        <div class="simulation-layout"><div class="panel glass simulation-panel"><div class="sim-head"><div><span class="eyebrow">SCENARIO BUILDER</span><h3>Hazard intensity</h3></div><strong id="intensityValue">6/10</strong></div><input id="intensity" type="range" min="1" max="10" value="6" /><div class="range-labels"><span>LOW</span><span>SEVERE</span></div><div class="scenario-controls"><label>Disaster type<select id="scenarioType"><option>Flood</option><option>Extreme Rainfall</option><option>Earthquake</option><option>Storm</option><option>Landslide</option><option>Heatwave</option></select></label><label>Exposure<select id="scenarioExposure"><option>Medium</option><option>Low</option><option>High</option></select></label></div><div class="scenario-output"><div><span>Projected risk</span><strong id="simRisk">72</strong><small>/100</small></div><div><span>Affected zones</span><strong id="simZones">3</strong></div><div><span>Priority</span><strong id="simPriority">HIGH</strong></div></div><div class="scenario-actions"><button class="primary" type="button" id="runScenarioBtn">Run What-If Simulation <span>→</span></button><button class="secondary" type="button" id="aiScenarioBtn">Generate AI Briefing <span>✦</span></button></div><div class="notice">⚠ Prototype decision-support simulation. Outputs must be verified against official information and professional judgment before action.</div></div><div class="panel glass scenario-visual"><div class="radar"><span></span><i></i><b>RISK<br>FIELD</b></div><div><span class="eyebrow">NIVARA SIGNAL</span><h3 id="scenarioHeadline">See how risk moves.</h3><p id="scenarioSummary">Increase hazard intensity to explore how response priority and potentially affected zones could change.</p><div class="scenario-brief" id="scenarioBrief"><b>Current planning view</b><span>Simulation not yet run.</span></div></div></div></div>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <div class="notification-panel glass" id="notificationPanel"><div class="notification-head"><div><span class="eyebrow">NIVARA ALERTS</span><h3>Notifications</h3></div><button class="secondary" id="enableNotificationsBtn">Enable alerts</button></div><div class="notification-list" id="notificationList"><div class="notification-item"><b>No new notifications</b><small>Important incident and hotspot updates will appear here.</small></div></div></div>
+
+  <div class="modal-backdrop" id="themeModal" aria-hidden="true">
+    <div class="modal glass theme-modal" role="dialog" aria-modal="true" aria-labelledby="themeTitle">
+      <div class="modal-head"><div><span class="eyebrow">PERSONALIZE NIVARA</span><h3 id="themeTitle">Choose your interface color</h3></div><button class="modal-close" data-close-modal="themeModal">×</button></div>
+      <p class="modal-copy">Pick an accent that feels right for you. Your choice is saved on this device and works offline.</p>
+      <div class="custom-color-row"><div><b>Custom color</b><small>Choose any accent you like.</small></div><label class="color-picker"><input id="customThemeColor" type="color" value="#51e5d4" aria-label="Choose custom interface color"><span>Pick</span></label></div>
+      <div class="theme-grid">
+        <button class="theme-swatch selected" data-theme="cyan"><i></i><span>Ocean Cyan</span></button>
+        <button class="theme-swatch" data-theme="violet"><i></i><span>Electric Violet</span></button>
+        <button class="theme-swatch" data-theme="blue"><i></i><span>Rescue Blue</span></button>
+        <button class="theme-swatch" data-theme="green"><i></i><span>Safety Green</span></button>
+        <button class="theme-swatch" data-theme="amber"><i></i><span>Emergency Amber</span></button>
+        <button class="theme-swatch" data-theme="rose"><i></i><span>Signal Rose</span></button>
+      </div>
+      <div class="modal-footer"><span>✓ Saved locally</span><button class="secondary" data-close-modal="themeModal">Done</button></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="signInModal" aria-hidden="true">
+    <div class="modal glass signin-modal" role="dialog" aria-modal="true" aria-labelledby="signinTitle">
+      <div class="modal-head"><div><span class="eyebrow">NIVARA ACCOUNT</span><h3 id="signinTitle">Welcome back</h3></div><button class="modal-close" data-close-modal="signInModal">×</button></div>
+      <div class="signin-brand"><div class="mini-brand-mark">N</div><div><b>Sign in to Nivara</b><small>Access your saved reports, preferences and response history.</small></div></div>
+      <div class="auth-tabs" role="tablist" aria-label="Sign in method">
+        <button type="button" class="auth-tab active" data-auth-tab="email">Email</button>
+        <button type="button" class="auth-tab" data-auth-tab="phone">Mobile Phone</button>
+      </div>
+      <form id="signInForm" class="signin-form">
+        <div class="auth-panel active" id="emailAuthPanel">
+          <label>Email address<input id="signinEmail" type="email" placeholder="you@example.com" autocomplete="email"></label>
+          <label>Password<input id="signinPassword" type="password" placeholder="Enter your password" autocomplete="current-password" minlength="4"></label>
+        </div>
+        <div class="auth-panel" id="phoneAuthPanel">
+          <label>Mobile number<input id="signinPhone" type="tel" inputmode="numeric" placeholder="+91 98765 43210" autocomplete="tel"></label>
+          <button type="button" class="secondary full" id="sendOtpBtn">Send OTP <span>→</span></button>
+          <div class="otp-row" id="otpRow" hidden><label>Enter 6-digit OTP<input id="signinOtp" type="text" inputmode="numeric" maxlength="6" placeholder="123456" autocomplete="one-time-code"></label><small id="otpStatus">Demo OTP sent.</small></div>
+        </div>
+        <label class="remember-row"><input id="rememberMe" type="checkbox" checked><span>Keep me signed in on this device</span></label>
+        <button class="primary full" type="submit" id="emailSignInBtn">Sign In <span>→</span></button>
+      </form>
+      <div class="or-divider"><span>or continue with</span></div>
+      <div class="social-auth-grid">
+        <button type="button" class="social-auth" data-provider="Google"><b>G</b> Google</button>
+        <button type="button" class="social-auth" data-provider="Apple"><b>●</b> Apple</button>
+        <button type="button" class="social-auth" data-provider="GitHub"><b>⌘</b> GitHub</button>
+      </div>
+      <div class="demo-note"><span>Prototype sign-in</span> Email, mobile OTP and social buttons are simulated locally for the hackathon demo. No real credentials are transmitted.</div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="routeModal" aria-hidden="true">
+    <div class="modal glass" role="dialog" aria-modal="true" aria-labelledby="routeTitle">
+      <div class="modal-head"><div><span class="eyebrow">SAFE ZONE ROUTE</span><h3 id="routeTitle">Open directions</h3></div><button class="modal-close" id="routeModalClose" type="button">×</button></div>
+      <p class="modal-copy">Your browser blocked the new route tab. Use the button below to open the destination in Google Maps.</p>
+      <div class="modal-footer"><span>External navigation</span><a class="primary" id="routeLink" href="#" target="_blank" rel="noopener noreferrer">Open Route →</a></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="careGuidanceModal" aria-hidden="true">
+    <div class="modal glass" role="dialog" aria-modal="true" aria-labelledby="careGuidanceTitle">
+      <div class="modal-head"><div><span class="eyebrow">NIVARA CARE</span><h3 id="careGuidanceTitle">Guardian Guidance</h3></div><button class="modal-close" data-close-modal="careGuidanceModal" type="button">×</button></div>
+      <div class="modal-copy" id="careGuidanceBody"></div>
+      <div class="guardian-profile glass" id="guardianProfileCard">
+        <div class="guardian-profile-head"><div><span class="eyebrow">TRUSTED GUARDIAN</span><h4>Guardian Contact</h4></div><button type="button" class="secondary" id="editGuardianBtn">Edit Details</button></div>
+        <div class="guardian-details" id="guardianDetails">No guardian details saved yet.</div>
+        <form id="guardianForm" class="guardian-form">
+          <label>Guardian Name<input id="guardianName" type="text" placeholder="e.g. Rahul Sharma" autocomplete="name"></label>
+          <label>Phone Number<input id="guardianPhone" type="tel" placeholder="e.g. +91 98765 43210" autocomplete="tel"></label>
+          <label>Relationship<input id="guardianRelation" type="text" placeholder="e.g. Father, Mother, Uncle" autocomplete="off"></label>
+          <label>Additional Details<textarea id="guardianExtra" rows="2" placeholder="Optional: address, alternate contact, language, etc."></textarea></label>
+          <div class="guardian-form-actions"><button type="submit" class="primary" id="guardianSubmitBtn">Submit Details <span>✓</span></button><button type="button" class="secondary" id="cancelGuardianBtn">Cancel</button></div>
+        </form>
+      </div>
+      <div class="modal-footer guardian-modal-footer"><span>Decision support only</span><div class="guardian-footer-actions"><button type="submit" form="guardianForm" class="primary" id="guardianSubmitFooter">Submit Details ✓</button><button class="secondary" data-close-modal="careGuidanceModal" type="button">Close</button></div></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="duplicateModal" aria-hidden="true">
+    <div class="modal glass duplicate-modal" role="dialog" aria-modal="true" aria-labelledby="duplicateTitle">
+      <div class="modal-head"><div><span class="eyebrow">EVIDENCE FUSION</span><h3 id="duplicateTitle">Possible duplicate report</h3></div><button class="modal-close" data-close-modal="duplicateModal">×</button></div>
+      <div class="duplicate-alert"><span>⚠</span><div><b>Nivara found a nearby similar incident.</b><p id="duplicateText">Another report appears to describe the same event. You can review it or submit your report anyway.</p></div></div>
+      <div class="duplicate-meta" id="duplicateMeta"></div>
+      <div class="duplicate-actions"><button type="button" class="secondary" id="duplicateCancel">Cancel</button><button type="button" class="primary" id="duplicateSubmit">Submit Anyway</button></div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js?v=13"></script>
+</body>
+</html>
